@@ -1,0 +1,21 @@
+name: Lint
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  phpcs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          tools: cs2pr, phpcs
+      - run: |
+          composer global require wp-coding-standards/wpcs --dev
+          phpcs --config-set installed_paths $(composer global config home)/vendor/wp-coding-standards/wpcs
+      - run: phpcs --standard=WordPress --extensions=php --ignore=vendor --report=checkstyle . | cs2pr
